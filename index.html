@@ -161,7 +161,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/" class="post-title-link" itemprop="url">winograg算法及稀疏矩阵乘</a>
+            <a href="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -172,7 +172,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-09-11 16:53:03 / 修改时间：16:53:29" itemprop="dateCreated datePublished" datetime="2025-09-11T16:53:03+08:00">2025-09-11</time>
+              <time title="创建时间：2025-09-11 17:02:32 / 修改时间：17:05:08" itemprop="dateCreated datePublished" datetime="2025-09-11T17:02:32+08:00">2025-09-11</time>
             </span>
 
           
@@ -187,370 +187,23 @@
 
       
           <h1 id="张量"><a href="#张量" class="headerlink" title="张量"></a>张量</h1><p>在计算机中，张量通常被表示为多维数组。一维张量类似于向量，二维张量类似于矩阵，而高阶张量则可以有任意数量的维度。例如，一个二维张量可以被表示为一个二维数组，其中的每个元素都有两个索引，分别用来表示行和列。</p>
-<h1 id="winograd算法"><a href="#winograd算法" class="headerlink" title="winograd算法"></a>winograd算法</h1><p>例子<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5C1757577699674.png" alt="1757577699674"><br>需要如下计算<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5C1757577709607.png" alt="1757577709607"><br>r0 &#x3D; d0<em>g0 + d1</em>g1 + d2<em>g2   # 3次乘法+2次加法<br>r1 &#x3D; d1</em>g0 + d2<em>g1 + d3</em>g2   # 3次乘法+2次加法<br>以上的计算过程总共需要 6 次乘法和 4 次加法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5C1757577722445.png" alt="1757577722445"><br>推导：<br>上面已经说过，如果我们直接进行矩阵乘，会得到 r0 &#x3D; d0 x g0 + d1 x g1 + d2 x g2，r1 &#x3D; d1 x g0 + d2 x g1 + d3 x g2 ，所以我们可以令：m1 + m2 + m3 &#x3D; r0，m2 - m3 - m4 &#x3D; r1。像这样：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cimage.png" alt="image" title="image"></p>
+<h1 id="winograd算法"><a href="#winograd算法" class="headerlink" title="winograd算法"></a>winograd算法</h1><p>例子<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5C1757581407684.png" alt="1757581407684"><br>需要如下计算<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5C1757581422920.png" alt="1757581422920"><br>r0 &#x3D; d0<em>g0 + d1</em>g1 + d2<em>g2   # 3次乘法+2次加法<br>r1 &#x3D; d1</em>g0 + d2<em>g1 + d3</em>g2   # 3次乘法+2次加法<br>以上的计算过程总共需要 6 次乘法和 4 次加法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5C1757581436548.png" alt="1757581436548"><br>推导：<br>上面已经说过，如果我们直接进行矩阵乘，会得到 r0 &#x3D; d0 x g0 + d1 x g1 + d2 x g2，r1 &#x3D; d1 x g0 + d2 x g1 + d3 x g2 ，所以我们可以令：m1 + m2 + m3 &#x3D; r0，m2 - m3 - m4 &#x3D; r1。像这样：</p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>先观察，两个等式中 m1、m4 是没有重复出现的，我先令 m1 &#x3D; d0 x g0，m4 &#x3D; -d3 x g2，这样可以约掉 m1 和 m4，所以左边只剩两个变量，两个等式两个变量即可求出 m3、m4，所以这个时候的 m1、m2、m3、m4 是这样的：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>观察 m2 中包含了 d1、d2、g0、g1、g2，将其转换为两个多项式乘积形式，拆成 d 和 g 分开的形式，如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>同理，对 m3 也进行如上转换，完了之后现在的 m1、m2、m3、m4 是这样的：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>这个时候让我们回到最开始的等价关系，进行观察，要是我在 m2、m3 上同时加上一个值，对于式 (b) 来说是不变的（所以 m4 不用动），对于式 (a) 来说需要给 m1 减去两倍的这个值。</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>观察现在的 m1、m2、m3、m4，当这个值是 (d2g0) &#x2F; 2 时可以简化表达式，所以这样给上面等式进行等价变换后得到的 m1、m2、m3、m4 如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <p>继续如上操作，如果给 m2 加上一个值，同时给 m3 减去这个值，那么对于式 (a) 来说是不变的 (所以 m1 不用动)，对于式 (b) 来说需要给 m4 减去两倍的这个值才能等价。同样观察现在的 m1、m2、m3、m4，当这个值为 (d1g2) &#x2F; 2 时可以进一步简化表达式，接着作这样的变换后得到最终的 m1、m2、m3、m4，如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
+<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5Cimage.png" alt="image" title="image"></p>
 <h1 id="稀疏矩阵乘"><a href="#稀疏矩阵乘" class="headerlink" title="稀疏矩阵乘"></a>稀疏矩阵乘</h1><p>压缩</p>
-<p>压缩稀疏行<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5C1757577746765.png" alt="1757577746765"><br>V         &#x3D; [ 10 20 30 40 50 60 70 80 ]<br>COL_INDEX &#x3D; [  0  1  1  3  2  3  4  5 ]<br>ROW_INDEX &#x3D; [  0  2  4  7  8 ]<br>压缩稀疏列<br>对角线压缩<br>对角线压缩利用了稀疏矩阵中对角线上大量为零的特点。它只存储对角线上的非零元素及其对应的行列索引，并将其他位置的元素设为零。这种方法适用于矩阵对角线上非零元素占比较大的情况。<br>块压缩<br>块压缩将稀疏矩阵分成多个块，只存储每个块中的非零元素及其对应的行列索引。这种方法适用于稀疏矩阵中非零元素分布比较均匀的情况，可以进一步减少存储空间</p>
-<p>BCSR<br>BCSR是对CSR的一般化和改进，它和CSR的区别在于把原矩阵分成了大小相同的block，block中的空元素则用0填上，于是每一个block都是稠密的，所以val数组会变大一些（需要填充一些0），但是索引却简化了,这里的精髓在于每一个块内部可以直接进行稠密的矩阵向量乘法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5C1757577765128.png" alt="1757577765128"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="秦夫子云">
-      <meta itemprop="description" content="欲买桂花同载酒，终不似，少年游">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="小小博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/" class="post-title-link" itemprop="url">winograg算法和稀疏矩阵乘</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-09-11 16:48:16 / 修改时间：16:48:42" itemprop="dateCreated datePublished" datetime="2025-09-11T16:48:16+08:00">2025-09-11</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="张量"><a href="#张量" class="headerlink" title="张量"></a>张量</h1><p>在计算机中，张量通常被表示为多维数组。一维张量类似于向量，二维张量类似于矩阵，而高阶张量则可以有任意数量的维度。例如，一个二维张量可以被表示为一个二维数组，其中的每个元素都有两个索引，分别用来表示行和列。</p>
-<h1 id="winograd算法"><a href="#winograd算法" class="headerlink" title="winograd算法"></a>winograd算法</h1><p>例子<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5C1757577699674.png" alt="1757577699674"><br>需要如下计算<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5C1757577709607.png" alt="1757577709607"><br>r0 &#x3D; d0<em>g0 + d1</em>g1 + d2<em>g2   # 3次乘法+2次加法<br>r1 &#x3D; d1</em>g0 + d2<em>g1 + d3</em>g2   # 3次乘法+2次加法<br>以上的计算过程总共需要 6 次乘法和 4 次加法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5C1757577722445.png" alt="1757577722445"><br>推导：<br>上面已经说过，如果我们直接进行矩阵乘，会得到 r0 &#x3D; d0 x g0 + d1 x g1 + d2 x g2，r1 &#x3D; d1 x g0 + d2 x g1 + d3 x g2 ，所以我们可以令：m1 + m2 + m3 &#x3D; r0，m2 - m3 - m4 &#x3D; r1。像这样：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>先观察，两个等式中 m1、m4 是没有重复出现的，我先令 m1 &#x3D; d0 x g0，m4 &#x3D; -d3 x g2，这样可以约掉 m1 和 m4，所以左边只剩两个变量，两个等式两个变量即可求出 m3、m4，所以这个时候的 m1、m2、m3、m4 是这样的：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>观察 m2 中包含了 d1、d2、g0、g1、g2，将其转换为两个多项式乘积形式，拆成 d 和 g 分开的形式，如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>同理，对 m3 也进行如上转换，完了之后现在的 m1、m2、m3、m4 是这样的：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>这个时候让我们回到最开始的等价关系，进行观察，要是我在 m2、m3 上同时加上一个值，对于式 (b) 来说是不变的（所以 m4 不用动），对于式 (a) 来说需要给 m1 减去两倍的这个值。</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>观察现在的 m1、m2、m3、m4，当这个值是 (d2g0) &#x2F; 2 时可以简化表达式，所以这样给上面等式进行等价变换后得到的 m1、m2、m3、m4 如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<p>继续如上操作，如果给 m2 加上一个值，同时给 m3 减去这个值，那么对于式 (a) 来说是不变的 (所以 m1 不用动)，对于式 (b) 来说需要给 m4 减去两倍的这个值才能等价。同样观察现在的 m1、m2、m3、m4，当这个值为 (d1g2) &#x2F; 2 时可以进一步简化表达式，接着作这样的变换后得到最终的 m1、m2、m3、m4，如下：</p>
-<p><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5Cimage.png" alt="image" title="image"></p>
-<h1 id="稀疏矩阵乘"><a href="#稀疏矩阵乘" class="headerlink" title="稀疏矩阵乘"></a>稀疏矩阵乘</h1><p>压缩</p>
-<p>压缩稀疏行<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5C1757577746765.png" alt="1757577746765"><br>V         &#x3D; [ 10 20 30 40 50 60 70 80 ]<br>COL_INDEX &#x3D; [  0  1  1  3  2  3  4  5 ]<br>ROW_INDEX &#x3D; [  0  2  4  7  8 ]<br>压缩稀疏列<br>对角线压缩<br>对角线压缩利用了稀疏矩阵中对角线上大量为零的特点。它只存储对角线上的非零元素及其对应的行列索引，并将其他位置的元素设为零。这种方法适用于矩阵对角线上非零元素占比较大的情况。<br>块压缩<br>块压缩将稀疏矩阵分成多个块，只存储每个块中的非零元素及其对应的行列索引。这种方法适用于稀疏矩阵中非零元素分布比较均匀的情况，可以进一步减少存储空间</p>
-<p>BCSR<br>BCSR是对CSR的一般化和改进，它和CSR的区别在于把原矩阵分成了大小相同的block，block中的空元素则用0填上，于是每一个block都是稠密的，所以val数组会变大一些（需要填充一些0），但是索引却简化了,这里的精髓在于每一个块内部可以直接进行稠密的矩阵向量乘法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%92%8C%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98.assets%5C1757577765128.png" alt="1757577765128"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/09/11/%E6%B1%82%E8%A7%A3%E5%99%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="秦夫子云">
-      <meta itemprop="description" content="欲买桂花同载酒，终不似，少年游">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="小小博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/09/11/%E6%B1%82%E8%A7%A3%E5%99%A8/" class="post-title-link" itemprop="url">求解器</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-09-11 15:57:21 / 修改时间：15:57:50" itemprop="dateCreated datePublished" datetime="2025-09-11T15:57:21+08:00">2025-09-11</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="1-什么是求解器？"><a href="#1-什么是求解器？" class="headerlink" title="1. 什么是求解器？"></a>1. 什么是求解器？</h4><p>求解器是用于求解数学方程组（如线性方程组、非线性方程组、偏微分方程等）的算法工具或程序模块。它以输入的系数矩阵和向量为基础，输出解的数值结果。</p>
-<h4 id="2-求解器的求解流程"><a href="#2-求解器的求解流程" class="headerlink" title="2. 求解器的求解流程"></a>2. 求解器的求解流程</h4><ol>
-<li><strong>初始化：</strong> 输入方程系数矩阵 AAA 和右端向量 bbb。</li>
-<li><strong>预处理（可选）：</strong> 针对矩阵的结构或性质，选用适当的预处理方法。</li>
-<li><strong>求解过程：</strong><ul>
-<li>使用直接法：构造分解（如 LU），求解方程组。</li>
-<li>使用迭代法：初始化解向量，迭代更新直到满足收敛准则。</li>
-</ul>
-</li>
-<li><strong>验证结果：</strong> 检查解的精度和残差。</li>
-</ol>
-<h4 id="3-求解器的求解方法有哪些？"><a href="#3-求解器的求解方法有哪些？" class="headerlink" title="3. 求解器的求解方法有哪些？"></a>3. 求解器的求解方法有哪些？</h4><ol>
-<li><p><strong>直接法求解器：</strong></p>
-<ul>
-<li>高斯消元</li>
-<li>LU分解、Cholesky分解</li>
-<li>QR分解</li>
-</ul>
-</li>
-<li><p><strong>迭代法求解器：</strong></p>
-<ul>
-<li>Jacobi法、Gauss-Seidel法</li>
-<li>共轭梯度法（CG）</li>
-<li>GMRES、BiCGStab</li>
-<li>多重网格法</li>
-</ul>
-</li>
-<li><p><strong>混合方法：</strong></p>
-<ul>
-<li>直接法结合迭代法（如预处理直接求粗解，然后用迭代法优化）。</li>
-</ul>
-<h3 id="1-直接法和迭代法是什么？"><a href="#1-直接法和迭代法是什么？" class="headerlink" title="1. 直接法和迭代法是什么？"></a>1. 直接法和迭代法是什么？</h3></li>
-</ol>
-<p><strong>直接法</strong><br>直接法是求解线性方程组（如 Ax&#x3D;bAx &#x3D; bAx&#x3D;b）的算法，直接通过有限步操作精确地找到解。常用的方法包括：</p>
-<ul>
-<li><strong>高斯消元法</strong></li>
-<li><strong>LU分解</strong></li>
-<li><strong>Cholesky分解</strong>（适用于正定矩阵）</li>
-</ul>
-<p><strong>迭代法</strong><br>迭代法是通过构造初始解并逐步逼近精确解的数值方法，适用于稀疏矩阵或规模较大的问题。每次迭代基于上一次的结果更新解，直到满足收敛准则。常见方法包括：</p>
-<ul>
-<li><strong>Jacobi迭代法</strong></li>
-<li><strong>Gauss-Seidel迭代法</strong></li>
-<li><strong>共轭梯度法（CG）</strong></li>
-<li><strong>广义最小二乘残差法（GMRES）</strong></li>
-</ul>
-<hr>
-<h3 id="2-直接法和迭代法的区别"><a href="#2-直接法和迭代法的区别" class="headerlink" title="2. 直接法和迭代法的区别"></a>2. 直接法和迭代法的区别</h3><table>
-<thead>
-<tr>
-<th><strong>方面</strong></th>
-<th><strong>直接法</strong></th>
-<th><strong>迭代法</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>精确性</strong></td>
-<td>精确解（仅受计算误差影响）</td>
-<td>近似解（逐步逼近精确解）</td>
-</tr>
-<tr>
-<td><strong>适用问题</strong></td>
-<td>小规模问题，稠密矩阵</td>
-<td>大规模问题，稀疏矩阵</td>
-</tr>
-<tr>
-<td><strong>计算成本</strong></td>
-<td>高，通常为 O(n3)O(n^3)O(n3)</td>
-<td>较低，单次迭代通常为 O(n)O(n)O(n) 或 O(m)O(m)O(m)</td>
-</tr>
-<tr>
-<td><strong>存储需求</strong></td>
-<td>需要存储整个矩阵，可能导致内存问题</td>
-<td>通常只需存储稀疏矩阵，适合大规模问题</td>
-</tr>
-<tr>
-<td><strong>可扩展性</strong></td>
-<td>不易扩展到超大规模问题</td>
-<td>容易扩展到超大规模问题，适合并行计算</td>
-</tr>
-<tr>
-<td><strong>预处理需求</strong></td>
-<td>通常不需要预处理</td>
-<td>通常需要预处理以加速收敛</td>
-</tr>
-</tbody></table>
-<hr>
-<h3 id="3-迭代法前面的预处理方式有哪些，如何根据需要选择合适的预处理方法？"><a href="#3-迭代法前面的预处理方式有哪些，如何根据需要选择合适的预处理方法？" class="headerlink" title="3. 迭代法前面的预处理方式有哪些，如何根据需要选择合适的预处理方法？"></a>3. 迭代法前面的预处理方式有哪些，如何根据需要选择合适的预处理方法？</h3><p><strong>常见预处理方法：</strong></p>
-<ol>
-<li><strong>对角预处理</strong>：使用矩阵的对角元素构造简单预条件器，计算成本低，适用于对角元素占优的矩阵。</li>
-<li><strong>不完全LU分解（ILU）</strong>：通过对原矩阵进行近似LU分解构造预条件器，适合稀疏矩阵。</li>
-<li><strong>不完全Cholesky分解（ICC）</strong>：适用于对称正定矩阵。</li>
-<li><strong>代数多重网格法（AMG）</strong>：一种高级预处理方法，适用于复杂的大规模稀疏矩阵问题。</li>
-<li><strong>稀疏逆近似（SAI）</strong>：构造稀疏的逆矩阵近似作为预条件器，计算成本低，适用于特殊结构的矩阵。</li>
-</ol>
-<p><strong>选择依据：</strong></p>
-<ul>
-<li>矩阵性质（稠密&#x2F;稀疏、对称性、正定性）：如正定矩阵优先考虑 ICC。</li>
-<li>计算资源：简单方法如对角预处理计算开销小，但可能效果有限。</li>
-<li>收敛速度需求：较难收敛的问题通常需要复杂的预处理（如 ILU 或 AMG）。</li>
-</ul>
-<hr>
-<h3 id="4-迭代法求解过程中，如何选择合理的迭代方法？"><a href="#4-迭代法求解过程中，如何选择合理的迭代方法？" class="headerlink" title="4. 迭代法求解过程中，如何选择合理的迭代方法？"></a>4. 迭代法求解过程中，如何选择合理的迭代方法？</h3><ul>
-<li><strong>共轭梯度法（CG）</strong>：适用于对称正定矩阵，具有快速收敛性。</li>
-<li><strong>GMRES（广义最小残差法）</strong>：适用于非对称或非正定矩阵，计算成本较高，但稳定性较好。</li>
-<li><strong>BiCGStab（双共轭梯度稳定法）</strong>：适用于非对称矩阵，改进了共轭梯度法。</li>
-<li><strong>最小二乘法（LSQR）</strong>：适用于稀疏或病态问题。</li>
-</ul>
-<p><strong>选择依据：</strong></p>
-<ul>
-<li>矩阵类型（对称性、正定性、稀疏性）</li>
-<li>计算资源和时间成本</li>
-<li>预处理器的兼容性</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/09/11/%E5%A4%AA%E5%88%9D%E5%85%83%E7%A2%81SDAA%20C%20%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="秦夫子云">
-      <meta itemprop="description" content="欲买桂花同载酒，终不似，少年游">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="小小博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/09/11/%E5%A4%AA%E5%88%9D%E5%85%83%E7%A2%81SDAA%20C%20%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">太初元碁SDAA C 编程模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-09-11 15:43:51 / 修改时间：15:55:42" itemprop="dateCreated datePublished" datetime="2025-09-11T15:43:51+08:00">2025-09-11</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li><h2 id="Teco异构并行计算平台"><a href="#Teco异构并行计算平台" class="headerlink" title="Teco异构并行计算平台"></a>Teco异构并行计算平台</h2><p><img src="C:\Users\13550\AppData\Roaming\Typora\typora-user-images\1757577310439.png" alt="1757577310439"><br>Teco异构并行模型采用主从异构的物理架构，即Host-Device运行模式。<br><img src="C:\Users\13550\AppData\Roaming\Typora\typora-user-images\1757577321758.png" alt="1757577321758"></p>
-<h2 id="SPMD于SDAA-C"><a href="#SPMD于SDAA-C" class="headerlink" title="SPMD于SDAA C"></a>SPMD于SDAA C</h2><p>SPMD（Single Program Multiple Data，单程序多数据），是一种用于任务并行的编程范式。其本质是将一个问题分解成若干个子问题，然后对其并行求解。</p>
-<p>SDAA C编程模型遵循SPMD编程范式，同一计算核心阵列SPA内所有计算核心SPE运行同一份应用程序，每个SPE可以独立完成对子问题的并行求解。其核心在于对复杂计算任务的切分，并合理地将计算任务分配到不同的SPE内进行计算。</p>
-<p><img src="http://docs.tecorigin.com/api/images/2023/12/1703349154-e01b96a8-a1b0-11ee-83e6-024214151608.png"></p>
-<p>SDAA C编程模型提供了<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=50v3qofpp8qt32">threadIdx</a>和<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=2w1loxbyiaf3jy">threadDim</a>为每个SPE定制计算任务。其中：</p>
-<ul>
-<li><p><code>threadIdx</code>：当前计算核心SPE的ID号，可以通过该关键字为目标SPE分配计算任务。</p>
-</li>
-<li><p><code>threadDim</code>：获取同一计算核心阵列SPA内计算核心SPE的总数。</p>
-</li>
-</ul>
-<h1 id="编程示例"><a href="#编程示例" class="headerlink" title="编程示例"></a>编程示例</h1><p>以数组计算为例，将计算任务分配到同一SPA的所有SPE内并行执行：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">using namespace sdaa;</span><br><span class="line">#define SIZE 67</span><br><span class="line"></span><br><span class="line">__device__ int g_data[SIZE];</span><br><span class="line">__global__ void func()</span><br><span class="line">&#123;</span><br><span class="line">    // 初始化原始数据</span><br><span class="line">    for (int i = 0; i &lt; SIZE; i++) &#123;</span><br><span class="line">        g_data[i] = i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // SPE同步，确保所有的SPE都完成了数据的初始化</span><br><span class="line">    sync_threads();</span><br><span class="line"></span><br><span class="line">    // 可用的计算资源超过计算量时，每个SPE承担一次计算</span><br><span class="line">    if (threadDim &gt;= SIZE) &#123;</span><br><span class="line">        if (threadIdx &lt; SIZE) &#123;</span><br><span class="line">            g_data[threadIdx]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        // 可用计算资源少于计算量时，每个SPE需承担多次计算</span><br><span class="line">        // 例如当前计算量为67，假如共有32个SPE参与计算。则每个SPE需要至少承担两次计算任务</span><br><span class="line">        int cal_time = SIZE / threadDim;</span><br><span class="line">        for (int i = 0; i &lt; cal_time; i++) &#123;</span><br><span class="line">            g_data[i * threadDim + threadIdx]++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 对于剩余的计算量使用部分SPE承担</span><br><span class="line">        // 例如当前的计算量为67，共有32个SPE参与计算，每个SPE计算两次后，还剩余3次。则使用0， 1， 2三个SPE完成剩余的计算任务</span><br><span class="line">        int remain_time = SIZE % threadDim;</span><br><span class="line">        if ((threadIdx + 1) &lt;= remain_time) &#123;</span><br><span class="line">            g_data[cal_time * threadDim + threadIdx]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // SPE同步，确保所有的SPE都完成了子问题的求解</span><br><span class="line">    sync_threads();</span><br><span class="line"></span><br><span class="line">    // 打印输出计算结果</span><br><span class="line">    for (int i = 0; i &lt; SIZE; i++) &#123;</span><br><span class="line">        printf(&quot;SPE ID = %lu, g_data[%d] = %d\n&quot;, threadIdx, i, g_data[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述应用程序中就通过SPMD编程范式完成对复杂任务的求解。</p>
-<ul>
-<li><p>SP（Single Program，单程序）：所有参与计算的SPE都执行同一份代码，在本例中为func函数。</p>
-</li>
-<li><p>MD（Multiple Data，多数据）：通过<code>threadIdx</code>将数组进行切分，每个SPE仅需完成少量运算。</p>
-<p>  在本例中：SIZE为67，假如可用计算资源为32个SPE，计算资源少于计算量，每个SPE需要承担多次计算，如：SPE0需要计算数据g_data[0]、g_data[32]和g_data[64]、SPE1需要计算数据g_data[1]、g_data[33]和g_data[65]等。</p>
-</li>
-</ul>
-<p><img src="http://docs.tecorigin.com/api/images/2023/12/1703349154-e01c9a9e-a1b0-11ee-83e6-024214151608.png"></p>
-<p>图2 使用SPMD编程范式完成数组计算任务</p>
-<p>具体计算任务的代码片段如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 可用计算资源少于计算量时，每个SPE需承担多次计算</span><br><span class="line">// 例如当前计算量为67，共有32个SPE参与计算。则每个SPE需要至少承担两次计算任务</span><br><span class="line">int cal_time = SIZE / threadDim;</span><br><span class="line">for (int i = 0; i &lt; cal_time; i++) &#123;</span><br><span class="line">    g_data[i * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">// 对于剩余的计算量使用部分SPE承担</span><br><span class="line">// 例如当前的计算量为67，共有32个SPE参与计算，每个SPE计算两次后，还剩余3次。则使用0， 1， 2三个SPE完成剩余的计算任务</span><br><span class="line">int remain_time = SIZE % threadDim;</span><br><span class="line">if ((threadIdx + 1) &lt;= remain_time) &#123;</span><br><span class="line">    g_data[cal_time * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>代码中涉及部分关键字含义如下：</p>
-<ul>
-<li><p><code>__device__</code>：运行空间标识符，修饰Device端的函数或变量，在Device端调用、运行，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=4wn5io4tqu76bi"><strong>device</strong></a>。</p>
-</li>
-<li><p><code>__global__</code>：函数标识符，修饰<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=4q3mo99jtb958d">Kernel函数</a>，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=3q81s6p06vm9q6"><strong>global</strong></a>。</p>
-</li>
-<li><p><code>sync_threads</code>：对同一计算核心阵列SPA内的所有或部分计算核心SPE进行同步操作，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=tr9rz7jadmda7">sync_threads</a>。</p>
-</li>
-<li><p><code>printf</code>：打印接口，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=4fyy51c7x5587d">printf</a>。</p>
-</li>
-</ul>
-</li>
-</ul>
+<p>压缩稀疏行<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5C1757581450698.png" alt="1757581450698"><br>V         &#x3D; [ 10 20 30 40 50 60 70 80 ]<br>COL_INDEX &#x3D; [  0  1  1  3  2  3  4  5 ]<br>ROW_INDEX &#x3D; [  0  2  4  7  8 ]<br>压缩稀疏列<br>对角线压缩<br>对角线压缩利用了稀疏矩阵中对角线上大量为零的特点。它只存储对角线上的非零元素及其对应的行列索引，并将其他位置的元素设为零。这种方法适用于矩阵对角线上非零元素占比较大的情况。<br>块压缩<br>块压缩将稀疏矩阵分成多个块，只存储每个块中的非零元素及其对应的行列索引。这种方法适用于稀疏矩阵中非零元素分布比较均匀的情况，可以进一步减少存储空间</p>
+<p>BCSR<br>BCSR是对CSR的一般化和改进，它和CSR的区别在于把原矩阵分成了大小相同的block，block中的空元素则用0填上，于是每一个block都是稠密的，所以val数组会变大一些（需要填充一些0），但是索引却简化了,这里的精髓在于每一个块内部可以直接进行稠密的矩阵向量乘法<br><img src="/2025/09/11/winograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98/D:%5CBlog%5Csource%5C_posts%5Cwinograg%E7%AE%97%E6%B3%95%E5%8F%8A%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E4%B9%98%5C1757581461010.png" alt="1757581461010"></p>
 
       
     </div>
@@ -632,13 +285,9 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">1</span>
           <span class="site-state-item-name">日志</span>
         </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">1</span>
-        <span class="site-state-item-name">标签</span>
       </div>
   </nav>
 </div>
