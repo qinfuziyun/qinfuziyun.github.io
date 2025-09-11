@@ -172,7 +172,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-09-11 15:43:51 / 修改时间：15:52:03" itemprop="dateCreated datePublished" datetime="2025-09-11T15:43:51+08:00">2025-09-11</time>
+              <time title="创建时间：2025-09-11 15:43:51 / 修改时间：15:55:42" itemprop="dateCreated datePublished" datetime="2025-09-11T15:43:51+08:00">2025-09-11</time>
             </span>
 
           
@@ -186,8 +186,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Teco异构并行计算平台</p>
-<p>![[Pasted image 20241102142046.png]]<br>Teco异构并行模型采用主从异构的物理架构，即Host-Device运行模式。<br>![[Pasted image 20241102142121.png]] </p>
+          <ul>
+<li><h2 id="Teco异构并行计算平台"><a href="#Teco异构并行计算平台" class="headerlink" title="Teco异构并行计算平台"></a>Teco异构并行计算平台</h2><p><img src="C:\Users\13550\AppData\Roaming\Typora\typora-user-images\1757577310439.png" alt="1757577310439"><br>Teco异构并行模型采用主从异构的物理架构，即Host-Device运行模式。<br><img src="C:\Users\13550\AppData\Roaming\Typora\typora-user-images\1757577321758.png" alt="1757577321758"></p>
 <h2 id="SPMD于SDAA-C"><a href="#SPMD于SDAA-C" class="headerlink" title="SPMD于SDAA C"></a>SPMD于SDAA C</h2><p>SPMD（Single Program Multiple Data，单程序多数据），是一种用于任务并行的编程范式。其本质是将一个问题分解成若干个子问题，然后对其并行求解。</p>
 <p>SDAA C编程模型遵循SPMD编程范式，同一计算核心阵列SPA内所有计算核心SPE运行同一份应用程序，每个SPE可以独立完成对子问题的并行求解。其核心在于对复杂计算任务的切分，并合理地将计算任务分配到不同的SPE内进行计算。</p>
 <p><img src="http://docs.tecorigin.com/api/images/2023/12/1703349154-e01b96a8-a1b0-11ee-83e6-024214151608.png"></p>
@@ -212,7 +212,7 @@
 <p><img src="http://docs.tecorigin.com/api/images/2023/12/1703349154-e01c9a9e-a1b0-11ee-83e6-024214151608.png"></p>
 <p>图2 使用SPMD编程范式完成数组计算任务</p>
 <p>具体计算任务的代码片段如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 可用计算资源少于计算量时，每个SPE需承担多次计算</span><br><span class="line">// 例如当前计算量为67，共有32个SPE参与计算。则每个SPE需要至少承担两次计算任务</span><br><span class="line">int cal_time = SIZE / threadDim;</span><br><span class="line">for (int i = 0; i &lt; cal_time; i++) &#123;</span><br><span class="line">    g_data[i * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对于剩余的计算量使用部分SPE承担</span><br><span class="line">// 例如当前的计算量为67，共有32个SPE参与计算，每个SPE计算两次后，还剩余3次。则使用0， 1， 2三个SPE完成剩余的计算任务</span><br><span class="line">int remain_time = SIZE % threadDim;</span><br><span class="line">if ((threadIdx + 1) &lt;= remain_time) &#123;</span><br><span class="line">    g_data[cal_time * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 可用计算资源少于计算量时，每个SPE需承担多次计算</span><br><span class="line">// 例如当前计算量为67，共有32个SPE参与计算。则每个SPE需要至少承担两次计算任务</span><br><span class="line">int cal_time = SIZE / threadDim;</span><br><span class="line">for (int i = 0; i &lt; cal_time; i++) &#123;</span><br><span class="line">    g_data[i * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">// 对于剩余的计算量使用部分SPE承担</span><br><span class="line">// 例如当前的计算量为67，共有32个SPE参与计算，每个SPE计算两次后，还剩余3次。则使用0， 1， 2三个SPE完成剩余的计算任务</span><br><span class="line">int remain_time = SIZE % threadDim;</span><br><span class="line">if ((threadIdx + 1) &lt;= remain_time) &#123;</span><br><span class="line">    g_data[cal_time * threadDim + threadIdx]++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>代码中涉及部分关键字含义如下：</p>
 <ul>
@@ -223,6 +223,8 @@
 <li><p><code>sync_threads</code>：对同一计算核心阵列SPA内的所有或部分计算核心SPE进行同步操作，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=tr9rz7jadmda7">sync_threads</a>。</p>
 </li>
 <li><p><code>printf</code>：打印接口，可参考<a target="_blank" rel="noopener" href="http://docs.tecorigin.com/release/sdaac/v1.9.0/?hash=4fyy51c7x5587d">printf</a>。</p>
+</li>
+</ul>
 </li>
 </ul>
 
