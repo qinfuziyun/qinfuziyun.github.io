@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"qinhaixiong.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SLIC 超像素分割算法的并行计算实现在图像处理领域，超像素分割作为一种重要的预处理技术，能够将图像划分为具有语义意义的像素簇，为后续的目标检测、图像分割等任务奠定基础。 SLIC 算法由 Radhakrishna Achanta 等人于 2012 年提出，其核心思想是通过线性迭代聚类将图像分割为具有相似颜色和空间位置的超像素。与传统算法相比，SLIC 具有计算效率高、参数少（近乎零参数）的特点，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SLIC超像素分割算法的并行计算实现">
+<meta property="og:url" content="http://qinhaixiong.top/2025/09/13/SLIC/index.html">
+<meta property="og:site_name" content="小小博客">
+<meta property="og:description" content="SLIC 超像素分割算法的并行计算实现在图像处理领域，超像素分割作为一种重要的预处理技术，能够将图像划分为具有语义意义的像素簇，为后续的目标检测、图像分割等任务奠定基础。 SLIC 算法由 Radhakrishna Achanta 等人于 2012 年提出，其核心思想是通过线性迭代聚类将图像分割为具有相似颜色和空间位置的超像素。与传统算法相比，SLIC 具有计算效率高、参数少（近乎零参数）的特点，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-13T08:35:26.000Z">
+<meta property="article:modified_time" content="2025-09-13T08:45:06.968Z">
+<meta property="article:author" content="秦夫子云">
+<meta property="article:tag" content="超算">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://qinhaixiong.top/2025/09/13/SLIC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SLIC超像素分割算法的并行计算实现 | 小小博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">小小博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://qinhaixiong.top/2025/09/13/SLIC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="秦夫子云">
+      <meta itemprop="description" content="欲买桂花同载酒，终不似，少年游">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SLIC超像素分割算法的并行计算实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-09-13 16:35:26 / 修改时间：16:45:06" itemprop="dateCreated datePublished" datetime="2025-09-13T16:35:26+08:00">2025-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SLIC-超像素分割算法的并行计算实现"><a href="#SLIC-超像素分割算法的并行计算实现" class="headerlink" title="SLIC 超像素分割算法的并行计算实现"></a>SLIC 超像素分割算法的并行计算实现</h1><p>在图像处理领域，超像素分割作为一种重要的预处理技术，能够将图像划分为具有语义意义的像素簇，为后续的目标检测、图像分割等任务奠定基础。</p>
+<p>SLIC 算法由 Radhakrishna Achanta 等人于 2012 年提出，其核心思想是通过线性迭代聚类将图像分割为具有相似颜色和空间位置的超像素。与传统算法相比，SLIC 具有计算效率高、参数少（近乎零参数）的特点，尤其适合实时性要求高的场景。</p>
+<p>算法的主要步骤包括：</p>
+<ol>
+<li><strong>颜色空间转换</strong>：将 RGB 图像转换到 LAB 颜色空间，LAB 空间的欧氏距离更符合人眼感知</li>
+<li><strong>种子点初始化</strong>：在图像中均匀采样种子点，并基于边缘强度调整位置</li>
+<li><strong>迭代聚类</strong>：以种子点为中心，计算邻域像素的颜色距离和空间距离，更新像素所属聚类</li>
+<li><strong>连通性增强</strong>：消除孤立小区域，保证超像素的连通性</li>
+</ol>
+<h2 id="算法优化策略与实现细节"><a href="#算法优化策略与实现细节" class="headerlink" title="算法优化策略与实现细节"></a>算法优化策略与实现细节</h2><h3 id="编译优化：开启-O3-选项"><a href="#编译优化：开启-O3-选项" class="headerlink" title="编译优化：开启 O3 选项"></a>编译优化：开启 O3 选项</h3><p>编译优化是最直接的性能提升手段。通过 GCC 的<code>-O3</code>选项，编译器会执行一系列优化操作，包括指令调度、循环展开、常量折叠等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -std=c++11 -O3 -fopenmp -mavx -mavx2 -march=native bestgai.cpp -o slictest</span><br></pre></td></tr></table></figure>
+
+<h3 id="AVX-向量化"><a href="#AVX-向量化" class="headerlink" title="AVX 向量化"></a>AVX 向量化</h3><p>AVX（Advanced Vector Extensions）指令集支持单指令多数据操作，能同时处理多个数据元素。在 SLIC 算法中，颜色空间转换部分是向量化优化的重点：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// RGB到LAB转换的AVX向量化实现</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">SLIC::RGB2XYZ</span><span class="params">(<span class="type">const</span> <span class="type">int</span>&amp; sR, <span class="type">const</span> <span class="type">int</span>&amp; sG, <span class="type">const</span> <span class="type">int</span>&amp; sB, <span class="type">double</span>&amp; X, <span class="type">double</span>&amp; Y, <span class="type">double</span>&amp; Z)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用AVX指令同时处理4个数据元素</span></span><br><span class="line">    __m256d rgb = _mm256_set_pd(<span class="number">0.0</span>, sB, sG, sR);</span><br><span class="line">    __m256d mmm = _mm256_set1_pd(<span class="number">255.0</span>);</span><br><span class="line">    __m256d result = _mm256_div_pd(rgb, mmm);</span><br><span class="line">    <span class="type">double</span> resultArray[<span class="number">4</span>];</span><br><span class="line">    _mm256_storeu_pd(resultArray, result);</span><br><span class="line">    <span class="type">double</span> R = resultArray[<span class="number">0</span>], G = resultArray[<span class="number">1</span>], B = resultArray[<span class="number">2</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 后续计算...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 向量化的核心在于将标量操作转换为向量操作，充分利用 CPU 的 SIMD 单元，减少指令周期数。 </p>
+<h3 id="OpenMP-并行：多线程分工加速迭代计算"><a href="#OpenMP-并行：多线程分工加速迭代计算" class="headerlink" title="OpenMP 并行：多线程分工加速迭代计算"></a>OpenMP 并行：多线程分工加速迭代计算</h3><p>SLIC 算法中的迭代聚类过程具有天然的并行性，通过 OpenMP 实现多线程并行计算：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 并行化RGB到LAB转换</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">SLIC::DoRGBtoLABConversion</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span>*&amp; ubuff, <span class="type">double</span>*&amp; lvec, <span class="type">double</span>*&amp; avec, <span class="type">double</span>*&amp; bvec)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sz = m_width * m_height;</span><br><span class="line">    lvec = <span class="keyword">new</span> <span class="type">double</span>[sz];</span><br><span class="line">    avec = <span class="keyword">new</span> <span class="type">double</span>[sz];</span><br><span class="line">    bvec = <span class="keyword">new</span> <span class="type">double</span>[sz];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用parallel for指令并行化循环</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> omp parallel for</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; sz; j++) &#123;</span><br><span class="line">        <span class="type">int</span> r = (ubuff[j] &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xFF</span>;</span><br><span class="line">        <span class="type">int</span> g = (ubuff[j] &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xFF</span>;</span><br><span class="line">        <span class="type">int</span> b = (ubuff[j]) &amp; <span class="number">0xFF</span>;</span><br><span class="line">        <span class="built_in">RGB2LAB</span>(r, g, b, lvec[j], avec[j], bvec[j]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 更复杂的并行优化体现在迭代聚类的分块处理 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">SLIC::PerformSuperpixelSegmentation_VariableSandM</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> xiancheng = <span class="built_in">omp_get_max_threads</span>();</span><br><span class="line">    <span class="type">int</span> group = sz / xiancheng;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 分块处理图像行</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> omp parallel</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> qq = <span class="built_in">omp_get_thread_num</span>();</span><br><span class="line">        <span class="type">int</span> start = qq * group;</span><br><span class="line">        <span class="type">int</span> endle = start + group;</span><br><span class="line">        <span class="keyword">if</span> (qq == xiancheng - <span class="number">1</span>) endle = m_height;</span><br><span class="line">        </span><br><span class="line">        <span class="meta">#<span class="keyword">pragma</span> omp parallel for</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> y = start; y &lt; endle; y++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> n = <span class="number">0</span>; n &lt; numk; n++) &#123;</span><br><span class="line">                <span class="comment">// 计算当前种子点的影响区域</span></span><br><span class="line">                <span class="type">int</span> wq1 = (<span class="type">int</span>)(kseedsy[n] - offset);</span><br><span class="line">                <span class="type">int</span> wq2 = (<span class="type">int</span>)(kseedsy[n] + offset);</span><br><span class="line">                <span class="keyword">if</span> (y &gt;= wq1 &amp;&amp; y &lt; wq2) &#123;</span><br><span class="line">                    <span class="type">int</span> x1 = <span class="built_in">max</span>(<span class="number">0</span>, (<span class="type">int</span>)(kseedsx[n] - offset));</span><br><span class="line">                    <span class="type">int</span> x2 = <span class="built_in">min</span>(m_width, (<span class="type">int</span>)(kseedsx[n] + offset));</span><br><span class="line">                    </span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> x = x1; x &lt; x2; x++) &#123;</span><br><span class="line">                        <span class="comment">// 计算颜色距离和空间距离</span></span><br><span class="line">                        <span class="type">int</span> i = y * m_width + x;</span><br><span class="line">                        <span class="type">double</span> l = m_lvec[i], a = m_avec[i], b = m_bvec[i];</span><br><span class="line">                        <span class="type">double</span> distlab = (l - kseedsl[n])*(l - kseedsl[n]) + </span><br><span class="line">                                        (a - kseedsa[n])*(a - kseedsa[n]) + </span><br><span class="line">                                        (b - kseedsb[n])*(b - kseedsb[n]);</span><br><span class="line">                        <span class="type">double</span> distxy = (x - kseedsx[n])*(x - kseedsx[n]) + </span><br><span class="line">                                       (y - kseedsy[n])*(y - kseedsy[n]);</span><br><span class="line">                        <span class="type">double</span> dist = distlab / maxlab[n] + distxy * invxywt;</span><br><span class="line">                        </span><br><span class="line">                        <span class="keyword">if</span> (dist &lt; distvec[i]) &#123;</span><br><span class="line">                            distvec[i] = dist;</span><br><span class="line">                            klabels[i] = n;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="循环调整"><a href="#循环调整" class="headerlink" title="循环调整"></a>循环调整</h3><p> 调整循环顺序、提取公共计算 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (column = <span class="number">0</span>; column &lt; <span class="number">100</span>; column++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (row = <span class="number">0</span>; row &lt; <span class="number">5</span>; row++) &#123;</span><br><span class="line">        sum += table[row][column];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 优化后：按列遍历，提升缓存命中率</span></span><br><span class="line"><span class="keyword">for</span> (row = <span class="number">0</span>; row &lt; <span class="number">5</span>; row++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (column = <span class="number">0</span>; column &lt; <span class="number">100</span>; column++) &#123;</span><br><span class="line">        sum += table[row][column];</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p> 将图像遍历从按行改为按列，并结合分块并行，进一步提升了数据局部性： </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> group1 = m_height / xiancheng;</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> omp parallel</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> qq = <span class="built_in">omp_get_thread_num</span>();</span><br><span class="line">    <span class="type">int</span> start = qq * group1;</span><br><span class="line">    <span class="type">int</span> endle = start + group1;</span><br><span class="line">    <span class="keyword">if</span> (qq == xiancheng - <span class="number">1</span>) endle = m_height;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> omp parallel for</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> y = start; y &lt; endle; y++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> n = <span class="number">0</span>; n &lt; numk; n++) &#123;</span><br><span class="line">            <span class="comment">// 种子点邻域计算...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="按需计算"><a href="#按需计算" class="headerlink" title="按需计算"></a>按需计算</h3><p>将使用频率低的数组改为按需计算，避免全程存储：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vector&lt;<span class="type">double</span>&gt; <span class="title">distxy</span><span class="params">(sz, DBL_MAX)</span></span>;</span><br><span class="line"><span class="function">vector&lt;<span class="type">double</span>&gt; <span class="title">distlab</span><span class="params">(sz, DBL_MAX)</span></span>;</span><br><span class="line"><span class="function">vector&lt;<span class="type">double</span>&gt; <span class="title">distvec</span><span class="params">(sz, DBL_MAX)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 优化后：按需计算，仅存储必要结果</span></span><br><span class="line"><span class="type">double</span> distlab = (l - kseedsl[n])*(l - kseedsl[n]) + </span><br><span class="line">                (a - kseedsa[n])*(a - kseedsa[n]) + </span><br><span class="line">                (b - kseedsb[n])*(b - kseedsb[n]);</span><br><span class="line"><span class="type">double</span> distxy = (x - kseedsx[n])*(x - kseedsx[n]) + </span><br><span class="line">               (y - kseedsy[n])*(y - kseedsy[n]);</span><br><span class="line"><span class="type">double</span> dist = distlab / maxlab[n] + distxy * invxywt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="性能优化结果"><a href="#性能优化结果" class="headerlink" title="性能优化结果"></a>性能优化结果</h2><p>通过上述优化策略的组合应用，SLIC 算法的性能得到显著提升，最终计算时间从基准值 25120ms 缩短至 350ms 左右，加速比超过 6474 倍。以下是各优化步骤的性能对比：</p>
+<table>
+<thead>
+<tr>
+<th>优化策略</th>
+<th>计算时间（ms）</th>
+<th>加速比（%）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基准版本</td>
+<td>25120</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>编译优化 - O3</td>
+<td>8600</td>
+<td>293.49</td>
+</tr>
+<tr>
+<td>AVX 向量化</td>
+<td>8539</td>
+<td>294.71</td>
+</tr>
+<tr>
+<td>OpenMP 并行</td>
+<td>1560</td>
+<td>1610.25</td>
+</tr>
+<tr>
+<td>按需计算</td>
+<td>1436</td>
+<td>1749.30</td>
+</tr>
+<tr>
+<td>循环层次调整</td>
+<td>388</td>
+<td>6474.22</td>
+</tr>
+<tr>
+<td>最终优化版本</td>
+<td>350</td>
+<td>-</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%B6%85%E7%AE%97/" rel="tag"># 超算</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/09/13/pra/" rel="prev" title="基础优化">
+      <i class="fa fa-chevron-left"></i> 基础优化
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SLIC-%E8%B6%85%E5%83%8F%E7%B4%A0%E5%88%86%E5%89%B2%E7%AE%97%E6%B3%95%E7%9A%84%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">SLIC 超像素分割算法的并行计算实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5%E4%B8%8E%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">1.1.</span> <span class="nav-text">算法优化策略与实现细节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E4%BC%98%E5%8C%96%EF%BC%9A%E5%BC%80%E5%90%AF-O3-%E9%80%89%E9%A1%B9"><span class="nav-number">1.1.1.</span> <span class="nav-text">编译优化：开启 O3 选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AVX-%E5%90%91%E9%87%8F%E5%8C%96"><span class="nav-number">1.1.2.</span> <span class="nav-text">AVX 向量化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenMP-%E5%B9%B6%E8%A1%8C%EF%BC%9A%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%86%E5%B7%A5%E5%8A%A0%E9%80%9F%E8%BF%AD%E4%BB%A3%E8%AE%A1%E7%AE%97"><span class="nav-number">1.1.3.</span> <span class="nav-text">OpenMP 并行：多线程分工加速迭代计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E8%B0%83%E6%95%B4"><span class="nav-number">1.1.4.</span> <span class="nav-text">循环调整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E9%9C%80%E8%AE%A1%E7%AE%97"><span class="nav-number">1.1.5.</span> <span class="nav-text">按需计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%BB%93%E6%9E%9C"><span class="nav-number">1.2.</span> <span class="nav-text">性能优化结果</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">秦夫子云</p>
+  <div class="site-description" itemprop="description">欲买桂花同载酒，终不似，少年游</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">秦夫子云</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
